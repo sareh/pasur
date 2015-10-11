@@ -20,27 +20,34 @@ h1{
   margin: -300px 0 0 -200px;
 }
 
-.card{
-  width:  68px;
-  height: 98px;
+.card {
+  width:  66px;
+  height: 96px;
+  border: 1px none;
+  float: left;
 }
-.card img{
+
+.card img {
   width: 100%;
+}
+
+.card.highlight {
+  border: 1px solid red;
 }
 
 #computer-hand,
 #player-hand {
   float:     left;
-  min-width: 280px;
-  height:    100px;
+  min-width: 278px;
+  height:    98px;
   border:    1px solid black;  
 }
 
 #computer-stash,
 #player-stash {
   float:      left;
-  width:      70px;
-  height:     100px;
+  width:      68px;
+  height:     98px;
   border:     1px solid black;
   background: green;
   text-align: center;
@@ -51,8 +58,8 @@ h1{
 #computer-staging,
 #player-staging {
   clear:       both;
-  width:       140px;
-  height:      100px;
+  width:       138px;
+  height:      98px;
   margin-left: 70px;
   border:      1px solid black;    
 }
@@ -73,15 +80,15 @@ h1{
 }
 
 #pool {
-  width: 280px;
-  height: 200px;
+  width: 278px;
+  height: 198px;
   float: left;
   border: 1px solid black;  
 }
 
 #deck-unplayed {
-  width: 70px;
-  height: 100px;
+  width: 68px;
+  height: 98px;
   float:left;
   border: 1px solid black;
 }
