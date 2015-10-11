@@ -31,7 +31,7 @@ h1{
   width: 100%;
 }
 
-.card.highlight {
+.card.clickable.highlight {
   border: 1px solid red;
 }
 
