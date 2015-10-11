@@ -84,7 +84,7 @@ $(function(){
     cardsObject["d"+"11"].points = 1;
     cardsObject["d"+"1"].points  = 1;
   }
-
+  /*************************************/
   function clearBoard(){
     unplayedCards = Object.keys(cardsObject);
     playedCards = [];      
@@ -95,22 +95,58 @@ $(function(){
     playedCards.push(unplayedCards.splice(pickedCardIndex,1)[0]);
     return playedCards[playedCards.length -1];
   }
+
+  function appendCardToDiv(card,parentDivId){ //parentDivId is $('#player-hand')
+    console.log("card is: "+card+" $(parentDivId) is: "+$(parentDivId));
+    var htmlToAppend =
+    '<div class="card" id="'+cardsObject[card].id+'">'+
+      '<img src="./images/'+cardsObject[card].img+'">'+
+    '</div>';
+    console.log(htmlToAppend);
+debugger    
+    $(parentDivId).append(htmlToAppend);
+debugger    
+  }
+
+  function removeCard(cardId){
+    $('#'+cardId).remove();
+  }
   
-  function dealFour(array){
+  function moveCardInDom(cardId, parentDivId, newParentDivId){
+    removeCard(cardId);
+    appendCardToDiv(cardId, newParentDivId);
+  }
+
+  function moveCardInArrays(cardId, array1, array2, i){
+    if (i){
+      var index = i;
+    } else {
+      var index = array1.indexOf(cardId);
+    }
+    array2.push(array1.splice(index,1)[0]);   
+  }
+
+  /*************************************/
+  
+  function dealFour(array, arrayId){
     for(var i=0; i < 4; i++){
-      array.push(pickCardFromUnplayedMoveToPlayed());
+      var cardId = pickCardFromUnplayedMoveToPlayed();
+      array.push(cardId);
+      console.log($('#'+arrayId));
+debugger
+      moveCardInDom(cardId,null,$('#'+arrayId));
     }
   }
 
   function initialDeal(){
-    dealFour(playerHand);
-    dealFour(computerHand);
-    dealFour(pool);
+    dealFour(playerHand, 'player-hand');
+    dealFour(computerHand, 'computer-hand');
+    dealFour(pool, 'pool');
   }
 
   function subsequentDeal(){
-    dealFour(playerHand);
-    dealFour(computerHand);
+    dealFour(playerHand, 'player-hand');
+    dealFour(computerHand, 'computer-hand');
   }  
 
   function playHands(){
@@ -119,64 +155,6 @@ $(function(){
       subsequentDeal();
     }
   }
-  function appendCardToDiv(card,parentDiv){
-    var htmlToAppend =
-    '<div class="card" id="'+cardsObject[card].id+'">'+
-      '<img src="./images/'+cardsObject[card].img+'">'+
-    '</div>';
-    parentDiv.append(htmlToAppend);
-  }
-  function removeCard(cardId){
-    $('#'+cardId).remove();
-  }
-
-  //remove the following function
-  // function addClickableClassToArray(array){
-  //   for(var i=0; i < array.length; i++){
-  //     $('#'+array[i]).addClass('.clickable');
-  //   }
-  // }
-
-  //remove the following function  
-  // function removeClickableClassFromArray(array){
-  //   for(var i=0; i < array.length; i++){
-  //     $('#'+array[i]).removeClass('.clickable');
-  //   }
-  // }
-
-  // function addHighlightClassEventListenersToArray(array){
-  //   for(var i=0; i < array.length; i++){
-  //     $('#'+array[i]).on("hover",function(){ 
-  //       $(this).addClass('.highlight');
-  //     });
-  //   }
-  // }
-
-  // function addClickableEventListenersToArray(array){
-  //   for(var i=0; i < array.length; i++){
-  //     $('#'+array[i]).on("click",function(){ 
-  //       hasSelectedFromHand  = true;
-  //       selectedCardFromHand = array[i];
-  //     });
-  //   }
-  // }
-
-  // function addClickableClassToId(id){
-  //   $('#'+id).addClass('.clickable');
-  // }
-
-  // function addHighlightClassEventListenersToId(id){
-  //   $('#'+id).on("hover",function(){ 
-  //     $(this).addClass('.highlight');
-  //   });
-  // }
-
-  // function addClickableEventListenersToId(id){
-  //   $('#'+id).on("click",function(){ 
-  //     hasSelectedFromPool  = true;
-  //     selectedCardFromPool = id;
-  //   });
-  // }
 
   function addClassToId(className, id){
     $('#'+id).addClass('.'+className);
@@ -198,10 +176,14 @@ $(function(){
     }
   }
 
+  /*************************************/
+
   function addEventListenerClickToId(id){
     $('#'+id).on("click",function(){ 
       hasSelectedFromPool  = true;
       selectedCardFromPool = id;
+      //when clicked, push from pool to the stagingArea.
+      moveCard(id,pool,playerStagingArea);
     });
   }
   
@@ -210,6 +192,8 @@ $(function(){
       $('#'+array[i]).on("click",function(){ 
         hasSelectedFromHand  = true;
         selectedCardFromHand = array[i];
+        //when clicked, push from playerHand to the PlayerStagingArea.
+        moveCard(array[i],playerHand,playerStagingArea,i);
       });
     }
   }
@@ -228,6 +212,17 @@ $(function(){
     }
   }
 
+  function removeAllEventListenersFromId(id){
+    $('#'+id).off();
+  }
+  
+  function removeAllEventListenersFromArray(array){
+    for(var i=0; i < array.length; i++){
+      $('#'+array[i]).off();
+    }
+  }
+
+
   // function addClickableEventListenersToPoolItems(id, statement){
   //   if(statement){
   //     $('#'+id).on("click",function(){ 
@@ -237,6 +232,8 @@ $(function(){
   //   }
   // }
 
+  /*************************************/
+  
   var numToSuit = {1:"c", 2:"s", 3:"h", 4:"d"};
   var suitToNum = {c:1, s:2, h:3, d:4};
 
@@ -257,6 +254,8 @@ $(function(){
   console.log("Starting initialisation");
   createPasurCards(); // Now cardsObject is defined.
   clearBoard(); // ensures unplayedCards includes all cards & playedCards is empty.
+
+  dealFour(pool, 'pool');
   initialDeal();
   console.log(cardsObject);
   console.log(unplayedCards.length);
@@ -276,45 +275,39 @@ $(function(){
     if(hasSelectedFromHand){//we now also have a selectedCardFromHand ="c1" (e.g) 
       //given selectedCardFromHand, loop through pool & tailor event listeners to the selectedCardFromHand's matched pair. 
 
+      playerStagingArea.push(selectedCardFromHand);
+
+      removeClassFromArray("clickable", playerHand);
+      removeClassFromArray("highlight", playerHand);
+      removeAllEventListenersFromArray(playerHand);
+
       for(var i=0; i < pool.length; i++){
-        if(cardsObject[pool[i]].face === matches[cardsObject[selectedCardFromHand].face]){
-          //make this card clickable & highlightable   
+        if(cardsObject[pool[i]].face === matches[cardsObject[chosenCardFromHand].face]){
+          //make this card clickable & highlightable}
+          addClassToId("clickable", pool[i]);
+          addClassToId("highlight", pool[i]);
+          addEventListenerHoverToId(pool[i]);
+          addEventListenerClickToId(pool[i]); //NB. when clicked on, the selectedCardFromPool = pool[i]; i.e. a true value. 
+        } else {
+          //ensure this card is *not* clickable & *not* highlightable
+          removeClassFromId("clickable", pool[i]);
+          removeClassFromId("highlight", pool[i]);
         }
       }
-      /*
-      switch (cardsObject[selectedCardFromHand].face){
-        case 11:
-        //make clickable all $('#'+pool[i]) w cardsObject[pool[i]].face === 11
-        if(pool[i])
-        $('#'+pool[i]).on("click",function(){
-          //
-        })
-        break;
-        case 12:
-        break;
-        case 13:
-        break;
-        default:
-        break;
-      }
-
-
-       === Q ||
-      Loop through pool array for(var i=0; i < pool.length; i++){
-        if cardsObject[pool[i]].face ===
-      } */
+      
+      //Now there should be a card selected from the pool. 
       if(hasSelectedFromPool){
-
+        //we know the card in selectedCardFromPool = "someId";
+        //Need to 
         //move all to stash
         //delay for 1 second
         //counter++
         counter++;
       }
-    }
-
+    }//closes if(hasSelectedFromHand)
   } else {
-    // Computer's turn
-
+    console.log("It's the computer's turn");
+    //NB. in addEventListenerClickToId we have hardcoded 'playerStagingArea'
   }
 
 
