@@ -135,6 +135,11 @@ $(function(){
     }
     return totalPoints;
   }
+  
+  function updatePoints(){
+    $('#player-score').innerHTML = checkPoints(playerStash);
+    $('#computer-score').innerHTML = checkPoints(computerStash);
+  }
 
   createPasurCards(); // Now cardsObject is defined.
   clearBoard(); // ensures unplayedCards includes all cards & playedCards is empty.
@@ -142,7 +147,7 @@ $(function(){
   //when you hover over a card, highlight it if it's a playable move.
   //if it is the player's turn, make it possible for the player to play, but not the computer.
 
-  
+  //add
 
   if(counter % 2 === 0){
   //player's turn
