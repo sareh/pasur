@@ -74,11 +74,44 @@ $(function(){
       }
     });
   }
-  
+
   function moveToStash(){
+    document.getElementById(selectedFromHand.id).firstChild.src = "./images/simorgh.jpg";
+    document.getElementById(selectedFromPool.id).firstChild.src = "./images/simorgh.jpg";
+    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromHand.id));
+    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromPool.id));
+    
+    document.getElementById(selectedFromHand.id).classList.add("stashed");
+    document.getElementById(selectedFromPool.id).classList.add("stashed");
+
+    document.getElementById(selectedFromHand.id).style.cssFloat = "none";
+    document.getElementById(selectedFromPool.id).style.cssFloat = "none";
+    sumPointsInStash();
 
   }
-  
+
+  function sumPointsInStash(){
+    var cardsInStash = document.getElementsByClassName("stashed");
+    console.log("cardsInStash"+cardsInStash);
+    var sum = 0;
+    for(var i=0; i < cardsInStash.length; i++){
+      sum += cards[cardsInStash[i].id].points;
+    }
+    document.getElementById("player-score").innerHTML = sum;
+    return sum;
+  }
+
+//The following would be useful for selecting several cards & summing them all up!
+// function sumFacesInStagingArea(){
+//     var cardsInStagingArea = document.getElementsByClassName("staging-area");
+//     var sum = 0;
+//     for(var i=0; i < cardsInStagingArea.length; i++){
+//       sum += cards[cardsInStagingArea[i].id].face;
+//     }
+//     return sum;
+//   }
+
+//  The above could be called if(sumFacesInStagingArea() === 11){moveAllToStash(); return "";}
 
 
 
