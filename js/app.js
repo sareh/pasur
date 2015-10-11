@@ -7,6 +7,8 @@ $(function(){
   var counter             = 0;
   var hasSelectedFromHand = false;
   var hasSelectedFromPool = false;
+  var selectedCardFromHand  = "";
+  var selectedCardFromPool  = "";
 
 
   var playerHand = [];
@@ -21,6 +23,21 @@ $(function(){
   var computerPoints = 0;
   var deckUnplayed = [];
   var message = "";
+
+  var matches = {"1":"10",
+                 "2":"9",
+                 "3":"8",
+                 "4":"7",
+                 "5":"6",
+                 "6":"5",
+                 "7":"4",
+                 "8":"3",
+                 "9":"2",
+                 "10":"1",
+                 "11":"11",
+                 "12":"12",
+                 "13":"13"
+                 };
 
   function createPasurCards(){ 
     //initialising clubs:
@@ -113,17 +130,112 @@ $(function(){
     $('#'+cardId).remove();
   }
 
-  function makeCardsInArrayClickable(array){
+  //remove the following function
+  // function addClickableClassToArray(array){
+  //   for(var i=0; i < array.length; i++){
+  //     $('#'+array[i]).addClass('.clickable');
+  //   }
+  // }
+
+  //remove the following function  
+  // function removeClickableClassFromArray(array){
+  //   for(var i=0; i < array.length; i++){
+  //     $('#'+array[i]).removeClass('.clickable');
+  //   }
+  // }
+
+  // function addHighlightClassEventListenersToArray(array){
+  //   for(var i=0; i < array.length; i++){
+  //     $('#'+array[i]).on("hover",function(){ 
+  //       $(this).addClass('.highlight');
+  //     });
+  //   }
+  // }
+
+  // function addClickableEventListenersToArray(array){
+  //   for(var i=0; i < array.length; i++){
+  //     $('#'+array[i]).on("click",function(){ 
+  //       hasSelectedFromHand  = true;
+  //       selectedCardFromHand = array[i];
+  //     });
+  //   }
+  // }
+
+  // function addClickableClassToId(id){
+  //   $('#'+id).addClass('.clickable');
+  // }
+
+  // function addHighlightClassEventListenersToId(id){
+  //   $('#'+id).on("hover",function(){ 
+  //     $(this).addClass('.highlight');
+  //   });
+  // }
+
+  // function addClickableEventListenersToId(id){
+  //   $('#'+id).on("click",function(){ 
+  //     hasSelectedFromPool  = true;
+  //     selectedCardFromPool = id;
+  //   });
+  // }
+
+  function addClassToId(className, id){
+    $('#'+id).addClass('.'+className);
+  }
+
+  function addClassToArray(className, array){
     for(var i=0; i < array.length; i++){
-      $("#"+array[i]).addClass('.clickable');
+      $('#'+array[i]).addClass('.'+className);
     }
+  }
+
+  function removeClassFromId(className, id){
+    $('#'+id).removeClass('.'+className);
+  }
+
+  function removeClassFromArray(className, array){
+    for(var i=0; i < array.length; i++){
+      $('#'+array[i]).removeClass('.'+className);
+    }
+  }
+
+  function addEventListenerClickToId(id){
+    $('#'+id).on("click",function(){ 
+      hasSelectedFromPool  = true;
+      selectedCardFromPool = id;
+    });
   }
   
-  function makeCardsInArrayUnclickable(array){
+  function addEventListenerClickToArray(array){
     for(var i=0; i < array.length; i++){
-      $("#"+array[i]).removeClass('.clickable');
+      $('#'+array[i]).on("click",function(){ 
+        hasSelectedFromHand  = true;
+        selectedCardFromHand = array[i];
+      });
     }
   }
+
+  function addEventListenerHoverToId(id){
+    $('#'+id).on("hover",function(){ 
+      $(this).addClass('.highlight');
+    });
+  }
+
+  function addEventListenerHoverToArray(array){
+    for(var i=0; i < array.length; i++){
+      $('#'+array[i]).on("hover",function(){ 
+        $(this).addClass('.highlight');
+      });
+    }
+  }
+
+  // function addClickableEventListenersToPoolItems(id, statement){
+  //   if(statement){
+  //     $('#'+id).on("click",function(){ 
+  //       hasSelectedFromPool = true;
+  //       selectedCardFromPool = id;
+  //     });
+  //   }
+  // }
 
   var numToSuit = {1:"c", 2:"s", 3:"h", 4:"d"};
   var suitToNum = {c:1, s:2, h:3, d:4};
@@ -135,32 +247,73 @@ $(function(){
     }
     return totalPoints;
   }
-  
+
   function updatePoints(){
     $('#player-score').innerHTML = checkPoints(playerStash);
     $('#computer-score').innerHTML = checkPoints(computerStash);
   }
 
+  /**********************************************************************/
+  console.log("Starting initialisation");
   createPasurCards(); // Now cardsObject is defined.
   clearBoard(); // ensures unplayedCards includes all cards & playedCards is empty.
   initialDeal();
-  //when you hover over a card, highlight it if it's a playable move.
-  //if it is the player's turn, make it possible for the player to play, but not the computer.
+  console.log(cardsObject);
+  console.log(unplayedCards.length);
+  console.log(playedCards.length);
 
-  //add
 
+
+  // If it is the player's turn, make it possible for the player to play, but not the computer.
   if(counter % 2 === 0){
-  //player's turn
-  //only allow the player's cards to be clickable.
-    
-    if(hasSelectedFromHand){
-      //make pool cards which add up to 11 clickable
+    // Player's turn
+    // Only allow the player's cards to be clickable (i.e. addClass("clickable"))
+    addClassToArray("clickable", playerHand);
+    addClassToArray("highlight", playerHand);
+    addEventListenerHoverToArray(playerHand);
+    addEventListenerClickToArray(playerHand);   
+
+    if(hasSelectedFromHand){//we now also have a selectedCardFromHand ="c1" (e.g) 
+      //given selectedCardFromHand, loop through pool & tailor event listeners to the selectedCardFromHand's matched pair. 
+
+      for(var i=0; i < pool.length; i++){
+        if(cardsObject[pool[i]].face === matches[cardsObject[selectedCardFromHand].face]){
+          //make this card clickable & highlightable   
+        }
+      }
+      /*
+      switch (cardsObject[selectedCardFromHand].face){
+        case 11:
+        //make clickable all $('#'+pool[i]) w cardsObject[pool[i]].face === 11
+        if(pool[i])
+        $('#'+pool[i]).on("click",function(){
+          //
+        })
+        break;
+        case 12:
+        break;
+        case 13:
+        break;
+        default:
+        break;
+      }
+
+
+       === Q ||
+      Loop through pool array for(var i=0; i < pool.length; i++){
+        if cardsObject[pool[i]].face ===
+      } */
       if(hasSelectedFromPool){
 
+        //move all to stash
+        //delay for 1 second
+        //counter++
+        counter++;
       }
     }
 
   } else {
+    // Computer's turn
 
   }
 
