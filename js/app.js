@@ -10,7 +10,6 @@ $(function(){
   var selectedCardFromHand  = "";
   var selectedCardFromPool  = "";
 
-
   var playerHand = [];
   var computerHand = [];
   var playerStagingArea = [];
@@ -98,14 +97,13 @@ $(function(){
 
   function appendCardToDiv(card,parentDivId){ //parentDivId is $('#player-hand')
     console.log("card is: "+card+" $(parentDivId) is: "+$(parentDivId));
+    
     var htmlToAppend =
     '<div class="card" id="'+cardsObject[card].id+'">'+
       '<img src="./images/'+cardsObject[card].img+'">'+
     '</div>';
-    console.log(htmlToAppend);
-debugger    
-    $(parentDivId).append(htmlToAppend);
-debugger    
+    console.log(htmlToAppend);    
+    $(parentDivId).append(htmlToAppend);   
   }
 
   function removeCard(cardId){
@@ -123,7 +121,8 @@ debugger
     } else {
       var index = array1.indexOf(cardId);
     }
-    array2.push(array1.splice(index,1)[0]);   
+    array1.splice(index,1);
+    array2.push(cardId);
   }
 
   /*************************************/
@@ -133,7 +132,6 @@ debugger
       var cardId = pickCardFromUnplayedMoveToPlayed();
       array.push(cardId);
       console.log($('#'+arrayId));
-debugger
       moveCardInDom(cardId,null,$('#'+arrayId));
     }
   }
@@ -183,7 +181,8 @@ debugger
       hasSelectedFromPool  = true;
       selectedCardFromPool = id;
       //when clicked, push from pool to the stagingArea.
-      moveCard(id,pool,playerStagingArea);
+      moveCardInArrays(id,pool,playerStagingArea);
+      moveCardInDom(id,pool,playerStagingArea);
     });
   }
   
@@ -192,8 +191,14 @@ debugger
       $('#'+array[i]).on("click",function(){ 
         hasSelectedFromHand  = true;
         selectedCardFromHand = array[i];
-        //when clicked, push from playerHand to the PlayerStagingArea.
-        moveCard(array[i],playerHand,playerStagingArea,i);
+        
+        var id = $(this).attr("id");
+        console.log(id);
+        moveCardInArrays(id,playerHand,playerStagingArea,i);
+        console.log(playerHand);
+        console.log("psa", playerStagingArea);
+        moveCardInDom(id, playerHand, "#player-staging");
+debugger
       });
     }
   }
@@ -255,11 +260,16 @@ debugger
   createPasurCards(); // Now cardsObject is defined.
   clearBoard(); // ensures unplayedCards includes all cards & playedCards is empty.
 
-  dealFour(pool, 'pool');
   initialDeal();
   console.log(cardsObject);
   console.log(unplayedCards.length);
   console.log(playedCards.length);
+  console.log(computerHand);
+  console.log(computerStagingArea);
+  console.log(pool);
+  console.log(playerStagingArea);
+  console.log(playerHand);
+
 
 
 
@@ -272,6 +282,7 @@ debugger
     addEventListenerHoverToArray(playerHand);
     addEventListenerClickToArray(playerHand);   
 
+    console.log(hasSelectedFromHand);
     if(hasSelectedFromHand){//we now also have a selectedCardFromHand ="c1" (e.g) 
       //given selectedCardFromHand, loop through pool & tailor event listeners to the selectedCardFromHand's matched pair. 
 
