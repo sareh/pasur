@@ -14,6 +14,7 @@ h1{
   padding:       20px;
   font-size:     2em;
   color:         #80DEEA;
+  font-family:   Verdana, Geneva, sans-serif;
 }
 
 .game-container {
@@ -70,7 +71,11 @@ h1{
   position:      relative;
 }
 
+.stashed {
+  display: none;
+}
 .score {
+  color:       #d40052;
   float:       left;
   max-width:   50px;
   max-height:  50px;
