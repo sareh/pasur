@@ -72,7 +72,11 @@ h1{
 }
 
 .stashed {
-  display: none;
+  position:  absolute;
+  top: 0px;
+  left: 0px;
+  z-index: -1;
+  /*display: none;*/
 }
 .score {
   color:       #d40052;
