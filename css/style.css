@@ -125,17 +125,17 @@ h1{
 }
 
 .horizontal-score {
-  color:       #d40052;
+  color:       black;
   float:       left;
   width:       50px;
   height:      50px;
   font-size:   50px;
-  text-shadow: -1px 0 #00BCD4, 0 1px #00BCD4, 1px 0 #00BCD4, 0 -1px #00BCD4;
+  /*text-shadow: -1px 0 #00BCD4, 0 1px #00BCD4, 1px 0 #00BCD4, 0 -1px #00BCD4;*/
   font-weight: bold;
   position:    absolute;
   top:         50%;
   left:        50%;
-  z-index:     999;
+  z-index:     10;
   margin:      -25px;
   text-align:  center;
 }
@@ -149,34 +149,27 @@ h1{
   text-align:  center;
 }
 
-.game-over {
- min-height:       640px;
- min-width:        580px;
- z-index:          800;
- position:         absolute;
- top:              50%;
- left:             50%;
- margin:           -143px 0 0 -380px;  
- background-color: #00BCD4;
-  /* max-width:        736px;
-  max-height:       285px;
-  z-index:          999;
-  position:         absolute;
-  top:              50%;
-  left:             50%;
-  margin:           -143px 0 0 -368px;
-  opacity:          0.8;*/
+#game-intro {
+  min-height:       680px;
+  min-width:        580px; 
+  z-index:          900;
+  background-color: #00BCD4;
 }
 
-.game-over > p {
+#game-over {
+  min-height:       680px;
+  min-width:        580px; 
+  z-index:          999;
+  background-color: #00BCD4;
+  display:          none;
+}
+
+.intro-para {
   text-align:       center;
   color:            black;/*#d40052;*//*#00BCD4;*/
-  font-size:        1.5em;
+  font-size:        2em;
   font-weight:      bold;
-  position:         absolute;
-  top:              50%;
-  left:             50%;
-  /*margin:           0 0 0 0;*/
-  /*margin:           -320px 0 0 -290px;*/
-  background-color: #d40052;
+  margin-top:       72px;
+  background-color: #ffc0d9;
+  line-height:      72px;
 }
