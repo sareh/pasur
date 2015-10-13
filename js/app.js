@@ -5,15 +5,19 @@ window.onload = function(){
   var playedCards         = [];
   var turn                = 0;
 
-  var hasSelectedFromHand = false;
-  var hasSelectedFromPool = false;
-  var selectedFromHand  = "";
-  var selectedFromPool  = "";
+  var hasSelectedFromHand   = false;
+  var hasSelectedFromPool   = false;
+  var selectedFromHand      = "";
+  var selectedFromPool      = "";
+  var selectedFromPoolArray = [];
+  var toBeStashed           = [];
 
-  var playerHand = [];
-  var pool = [];
-  var playerStash = [];
+  var playerHand   = [];
+  var pool         = [];
+  var playerStash  = [];
   var playerPoints = 0;
+  var timeTaken    = 0;
+  var endOfGame    = false;
   var matches = {"1":"10",
                  "2":"9",
                  "3":"8",
@@ -28,8 +32,6 @@ window.onload = function(){
                  "12":"12",
                  "13":"13"
                  };
-  var timeTaken = 0; 
-  var sumFaces  = 0;
 
   /******************************************/                
   
@@ -40,231 +42,16 @@ window.onload = function(){
   setEventListenerOnHandCards();
   setEventListenerOnPoolDiv();
   setEventListenerOnPoolCards();
-
-
-  //when I call moveToStash() or moveToPool() I need to afterwards 
-
-  // oneTurn();
-//this works
-  // if (playerHand !==0) {
-  //   oneTurn();
-  // } else {
-  //   console.log("ran out!")
-  // }
-
-  // for (var i=0; i<2; i++){
-  //   if (playerHand !==0) {
-  //     console.log(i);
-  //     oneTurn();
-  //   } else {
-  //     console.log("ran out!")
-  //   }
-  //   console.log()
-  // }
- 
-
-  // while(turn<48){
-  //   console.log("here");
-  //   if(playerHand.length !== 0 ){
-  //     console.log("hi");
-  //       oneTurn();
-  //   }
-  //   //   subsequentDeal();
-  //   //   oneTurn();
-  //   // }
-  //   // oneTurn();
-  // }
-  // playGame(); 
-  // oneTurn();
   
   /******************************************/   
   /**************Functions******************/
   /****************************************/
+
+  /******************************************/   
+  /*********Initialisation Functions********/
+  /****************************************/
   function playGame(){
 
-  }
-  function resetHoldingVariables(){
-    hasSelectedFromHand = false;
-    hasSelectedFromPool = false;
-    selectedFromHand  = "";
-    selectedFromPool  = "";
-  }
-
-  function removeEventListeners(){
-    document.getElementById("pool").removeEventListener();
-    for(var i=0; i < playerHand.length; i++){
-      document.getElementById(playerHand[i]).removeEventListener();
-    }   
-    for(var i=0; i < pool.length; i++){
-      document.getElementById(pool[i]).removeEventListener();
-    }
-  }
-
-  function setEventListenerOnHandCards(){
-    for(var i=0; i < playerHand.length; i++){
-      document.getElementById(playerHand[i]).addEventListener("click",function(){
-        if(hasSelectedFromHand && (selectedFromHand.id !== this.id)){
-          return "You have already clicked on another card. This not allowed.";
-        }
-        if(hasSelectedFromHand && (selectedFromHand.id === this.id)){
-          selectedFromHand.classList.remove("selected");
-          selectedFromHand = "";
-          hasSelectedFromHand  = false;
-          return "Unselected the card you just clicked on.";
-        }
-        selectedFromHand = this;
-        hasSelectedFromHand  = true;
-        selectedFromHand.classList.add("selected");
-      });
-    }
-  }
-
-  function setEventListenerOnPoolCards(){
-    for(var i=0; i < pool.length; i++){
-      // console.log("pool[i]"+pool[i]);
-      document.getElementById(pool[i]).addEventListener("click",function(){
-        if(!hasSelectedFromHand){
-          return "Select a card from the hand first!";
-        }
-        //this executes when (hasSelectedFromHand && hasSelectedFromPool)
-        //and also when (hasSelectedFromHand && !hasSelectedFromPool)
-        if(selectedFromPool.id === this.id){
-          selectedFromPool.classList.remove("selected");
-          selectedFromPool = "";
-          hasSelectedFromPool = false; //this one
-          return "Unselected the card you just clicked on.";
-        }
-        event.stopPropagation();
-        selectedFromPool = this;
-        hasSelectedFromPool  = true;
-        selectedFromPool.classList.add("selected");
-
-        var a = cards[selectedFromPool.id].face;
-        var b = matches[cards[selectedFromHand.id].face];
-
-        if(parseInt(a) === parseInt(b)){
-          console.log("The cards match!");
-          setTimeout(moveToStash,500);
-        } else {
-          console.log("Oops, they don't match. You lose the card. Try again!");
-        }
-      });
-    }
-  }
-
-  function setEventListenerOnPoolDiv(){
-    document.getElementById("pool").addEventListener("click",function(){
-      if(!hasSelectedFromHand){
-        return "Select a card from the hand first!";
-      }
-      console.log("You've clicked on the pool!");
-      moveSelectedFromHandToPool();
-      return "Have moved a card to the Pool & reset holding variables";
-    });
-  }
-
-  function oneTurn(){
-    
-    turn++;
-    // resetHoldingVariables();
-
-    for(var i=0; i < playerHand.length; i++){
-      document.getElementById(playerHand[i]).addEventListener("click",function(){
-        if(hasSelectedFromHand && (selectedFromHand.id !== this.id)){
-          return "You have already clicked on another card. This not allowed.";
-        }
-        if(hasSelectedFromHand && (selectedFromHand.id === this.id)){
-          selectedFromHand.classList.remove("selected");
-          selectedFromHand = "";
-          hasSelectedFromHand  = false;
-          return "Unselected the card you just clicked on.";
-        }
-        selectedFromHand = this;
-        hasSelectedFromHand  = true;
-        selectedFromHand.classList.add("selected");
-      });
-    }
-    document.getElementById("pool").addEventListener("click",function(){
-      if(!hasSelectedFromHand){
-        return "Select a card from the hand first!";
-      }
-      console.log("You've clicked on the pool!");
-      moveSelectedFromHandToPool();
-      return "Have moved a card to the Pool & reset holding variables";
-    });
-
-    for(var i=0; i < pool.length; i++){
-      // console.log("pool[i]"+pool[i]);
-      document.getElementById(pool[i]).addEventListener("click",function(){
-        if(!hasSelectedFromHand){
-          return "Select a card from the hand first!";
-        }
-        //this executes when (hasSelectedFromHand && hasSelectedFromPool)
-        //and also when (hasSelectedFromHand && !hasSelectedFromPool)
-        if(selectedFromPool.id === this.id){
-          selectedFromPool.classList.remove("selected");
-          selectedFromPool = "";
-          hasSelectedFromPool = false; //this one
-          return "Unselected the card you just clicked on.";
-        }
-        event.stopPropagation();
-        selectedFromPool = this;
-        hasSelectedFromPool  = true;
-        selectedFromPool.classList.add("selected");
-
-        var a = cards[selectedFromPool.id].face;
-        var b = matches[cards[selectedFromHand.id].face];
-
-        if(parseInt(a) === parseInt(b)){
-          console.log("The cards match!");
-          setTimeout(moveToStash,500);
-        } else {
-          console.log("Oops, they don't match. You lose the card. Try again!");
-        }
-      });
-    }
-  }
-
-  function moveToStash(){
-    document.getElementById(selectedFromHand.id).firstChild.src = "./images/backside.png";
-    document.getElementById(selectedFromPool.id).firstChild.src = "./images/backside.png";
-    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromHand.id));
-    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromPool.id));
-
-    document.getElementById(selectedFromHand.id).classList.remove("selected");
-    document.getElementById(selectedFromPool.id).classList.remove("selected");
-
-    document.getElementById(selectedFromHand.id).classList.add("stashed");
-    document.getElementById(selectedFromPool.id).classList.add("stashed");
-
-    document.getElementById(selectedFromHand.id).style.cssFloat = "none";
-    document.getElementById(selectedFromPool.id).style.cssFloat = "none";
-    sumPointsInStash();
-    resetHoldingVariables();
-    document.getElementById(selectedFromHand.id).removeEventListener();
-    document.getElementById(selectedFromPool.id).removeEventListener();
-    dealOne(playerHand, 'player-hand');
-  }
-
-  function moveSelectedFromHandToPool(){
-    document.getElementById(selectedFromHand.id).classList.remove("selected");
-    document.getElementById("pool").appendChild(document.getElementById(selectedFromHand.id));
-    resetHoldingVariables();
-    document.getElementById(selectedFromHand.id).removeEventListener();
-    document.getElementById(selectedFromPool.id).removeEventListener();
-    dealOne(playerHand, 'player-hand');
-    setEventListenerOnHandCard(selectedFromHand.id);
-    setEventListenerOnPoolCard(selectedFromPool.id);
-  }
-
-  function sumPointsInStash(){
-    var cardsInStash = document.getElementsByClassName("stashed");
-    var sum = 0;
-    for(var i=0; i < cardsInStash.length; i++){
-      sum += cards[cardsInStash[i].id].points;
-    }
-    document.getElementById("player-score").innerHTML = sum;
-    return sum;
   }
 
   function createPasurCards(){
@@ -323,41 +110,110 @@ window.onload = function(){
 
   function dealFour(array, arrayId){
     for(var i=0; i < 4; i++){
-      console.log("arrived");
       var cardId = pickCardFromUnplayedMoveToPlayed();
       array.push(cardId);
-      // console.log($('#'+arrayId));
       moveCardInDom(cardId,null,$('#'+arrayId));
     }
   }
+
   function dealOne(array, arrayId){
-    // for(var i=0; i < 1; i++){
+    for(var i=0; i < 1; i++){
       var cardId = pickCardFromUnplayedMoveToPlayed();
+      if(!cardId){
+        endOfGame = true;
+        displayEndOfGameSequence();
+      }
       array.push(cardId);
       moveCardInDom(cardId,null,$('#'+arrayId));
-    // }
+    }
     setEventListenerOnHandCard(cardId);
   }
 
-  function setEventListenerOnHandCard(cardId){
-    document.getElementById(cardId).addEventListener("click",function(){
-      if(hasSelectedFromHand && (selectedFromHand.id !== this.id)){
-        return "You have already clicked on another card. This not allowed.";
+  function initialDeal(){
+    dealFour(playerHand, 'player-hand');
+    dealFour(pool, 'pool');
+  }
+
+  function subsequentDeal(){
+    dealFour(playerHand, 'player-hand');
+  }
+
+  function resetHoldingVariables(){
+    hasSelectedFromHand = false;
+    hasSelectedFromPool = false;
+    selectedFromHand  = "";
+    selectedFromPool  = "";
+  }
+
+  /******************************************/   
+  /*********Event Listener Functions********/
+  /****************************************/
+
+  function setEventListenerOnPoolDiv(){
+    document.getElementById("pool").addEventListener("click",function(){
+      if(!hasSelectedFromHand){
+        return "Select a card from the hand first!";
       }
-      if(hasSelectedFromHand && (selectedFromHand.id === this.id)){
-        selectedFromHand.classList.remove("selected");
-        selectedFromHand = "";
-        hasSelectedFromHand  = false;
-        return "Unselected the card you just clicked on.";
-      }
-      selectedFromHand = this;
-      hasSelectedFromHand  = true;
-      selectedFromHand.classList.add("selected");
+      // console.log("You've clicked on the pool!");
+      moveSelectedFromHandToPool();
+      return "Have moved a card to the Pool & reset holding variables";
     });
   }
-   
+
+  function setEventListenerOnHandCards(){
+    for(var i=0; i < playerHand.length; i++){
+      setEventListenerOnHandCard(playerHand[i]);
+    }
+  }
+
+  function setEventListenerOnHandCard(cardId){
+    document.getElementById(cardId).addEventListener("click",handCardListener);
+  }
+
+  function removeEventListenerOnHandCard(cardId){
+    document.getElementById(cardId).removeEventListener("click",handCardListener);
+  }
+
+  function handCardListener(){
+    if(hasSelectedFromHand && (selectedFromHand.id !== this.id)){
+      return "You have already clicked on another card. This not allowed.";
+    }
+    if(hasSelectedFromHand && (selectedFromHand.id === this.id)){
+      selectedFromHand.classList.remove("selected");
+      selectedFromHand = "";
+      hasSelectedFromHand  = false;
+      return "Unselected the card you just clicked on.";
+    }
+    selectedFromHand = this;
+    hasSelectedFromHand  = true;
+    selectedFromHand.classList.add("selected");
+
+    if(parseInt(cards[selectedFromHand.id].face) === 11){
+      //If J, loop through the whole pool, finding all which are not K or Q:
+      for(var i=0; i < pool.length; i++){
+        if(parseInt(cards[pool[i]].face) < 12){
+          selectedFromPoolArray.push(pool[i]);
+        }
+      }
+      setTimeout(moveMany,300);
+    }
+  }
+
+  function setEventListenerOnPoolCards(){
+    for(var i=0; i < pool.length; i++){
+      setEventListenerOnPoolCard(pool[i]);
+    }
+  }
+
   function setEventListenerOnPoolCard(cardId){
-    document.getElementById(cardId).addEventListener("click",function(){
+    document.getElementById(cardId).addEventListener("click",poolCardListener);
+  }
+
+  function removeEventListenerOnPoolCard(cardId){
+    document.getElementById(cardId).removeEventListener("click",poolCardListener);
+  }
+
+  function poolCardListener(cardId){
       if(!hasSelectedFromHand){
         return "Select a card from the hand first!";
       }
@@ -378,29 +234,119 @@ window.onload = function(){
       var b = matches[cards[selectedFromHand.id].face];
 
       if(parseInt(a) === parseInt(b)){
-        console.log("The cards match!");
-        setTimeout(moveToStash,500);
+        // console.log("The cards match!");
+        setTimeout(moveTwo,300);
       } else {
         console.log("Oops, they don't match. You lose the card. Try again!");
       }
-    });
   }
 
-  function initialDeal(){
-    dealFour(playerHand, 'player-hand');
-    dealFour(pool, 'pool');
+  /******************************************/   
+  /****************Matching*****************/
+  /****************************************/
+  
+  function checkIfMatching(selectedFromHand,selectedFromPoolArray){
+
+  }
+  
+  /******************************************/   
+  /**********Moving Cards Functions*********/
+  /****************************************/
+
+  function moveTwo(){
+    moveFromHandToStash(selectedFromHand.id);
+    moveFromPoolToStash(selectedFromPool.id);
+
+    sumPointsInStash();
+    resetHoldingVariables();
+    dealOne(playerHand, 'player-hand');
   }
 
-  function subsequentDeal(){
-    dealFour(playerHand, 'player-hand');
+  function moveMany(){
+    moveFromHandToStash(selectedFromHand.id);
+    moveManyFromPoolToStash(selectedFromPoolArray);
+
+    sumPointsInStash();
+    resetHoldingVariables();
+    dealOne(playerHand, 'player-hand');
+  }
+
+  function moveToStash(){
+    document.getElementById(selectedFromHand.id).firstChild.src = "./images/backside.png";
+    document.getElementById(selectedFromPool.id).firstChild.src = "./images/backside.png";
+    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromHand.id));
+    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromPool.id));
+    removeEventListenerOnHandCard(selectedFromHand.id);
+    removeEventListenerOnPoolCard(selectedFromPool.id);
+
+    document.getElementById(selectedFromHand.id).classList.remove("selected");
+    document.getElementById(selectedFromPool.id).classList.remove("selected");
+
+    document.getElementById(selectedFromHand.id).classList.add("stashed");
+    document.getElementById(selectedFromPool.id).classList.add("stashed");
+
+    document.getElementById(selectedFromHand.id).style.cssFloat = "none";
+    document.getElementById(selectedFromPool.id).style.cssFloat = "none";
+    sumPointsInStash();
+    resetHoldingVariables();
+    dealOne(playerHand, 'player-hand');    
+  }
+
+  function moveFromHandToStash(cardId){
+    document.getElementById(cardId).firstChild.src = "./images/backside.png";
+    document.getElementById("player-stash").appendChild(document.getElementById(cardId));
+    removeEventListenerOnHandCard(cardId);
+    document.getElementById(cardId).classList.remove("selected");
+    document.getElementById(cardId).classList.add("stashed");
+    document.getElementById(cardId).style.cssFloat = "none";
+    var index = playerHand.indexOf(cardId);    
+    if (index > -1) {
+      playerStash.push(playerHand[index]);
+      playerHand.splice(index, 1);
+    }
+  }
+
+  function moveFromPoolToStash(cardId){
+    document.getElementById(cardId).firstChild.src = "./images/backside.png";
+    document.getElementById("player-stash").appendChild(document.getElementById(cardId));
+    removeEventListenerOnPoolCard(cardId);
+    document.getElementById(cardId).classList.remove("selected");
+    document.getElementById(cardId).classList.add("stashed");
+    document.getElementById(cardId).style.cssFloat = "none";
+    var index = pool.indexOf(cardId);    
+    if (index > -1) {
+      playerStash.push(pool[index]);
+      pool.splice(index, 1);
+    }
+  }
+
+  function moveManyFromPoolToStash(){
+    for(var i=0; i < selectedFromPoolArray.length; i++){
+      moveFromPoolToStash(selectedFromPoolArray[i]);
+    }
+  }
+
+  function moveSelectedFromHandToPool(){
+    document.getElementById(selectedFromHand.id).classList.remove("selected");
+    document.getElementById("pool").appendChild(document.getElementById(selectedFromHand.id));
+    removeEventListenerOnHandCard(selectedFromHand.id);
+    setEventListenerOnPoolCard(selectedFromHand.id);
+
+    var index = playerHand.indexOf(selectedFromHand.id);    
+    if (index > -1) {
+      pool.push(playerHand[index]);
+      playerHand.splice(index, 1);
+    }
+
+    resetHoldingVariables();
+    dealOne(playerHand, 'player-hand');
   }
 
   function appendCardToDiv(card,parentDivId){   
     var htmlToAppend =
     '<div class="card" id="'+card+'">'+
       '<img src="./images/'+cards[card].img+'">'+
-    '</div>';
-    // console.log(htmlToAppend);    
+    '</div>'; 
     $(parentDivId).append(htmlToAppend);   
   }
 
@@ -423,4 +369,46 @@ window.onload = function(){
     array2.push(cardId);
   }
 
+  /******************************************/   
+  /*****************Points******************/
+  /****************************************/
+  
+  function sumPointsInStash(){
+    var cardsInStash = document.getElementsByClassName("stashed");
+    var sum = 0;
+    for(var i=0; i < cardsInStash.length; i++){
+      sum += cards[cardsInStash[i].id].points;
+    }
+    document.getElementById("player-score").innerHTML = sum;
+    playerPoints = sum;
+    return playerPoints;
+  }
+
+//will be called as ...("click",displayEndOfGameSequence("win"));
+//will be called as ...("click",displayEndOfGameSequence("lose"));
+  function displayEndOfGameSequence(winOrLose){
+    var finalMessage = "";
+    //fade out the cards in the stash. 
+    // .classList.add("selected")
+    // document.getElementsByClassName("stashed")
+
+    if(winOrLose === "win"){
+      finalMessage = "You've Won! You have "+points+" points. Want to play again? Click here!";
+    }else if(winOrLose === "lose"){
+      finalMessage = "Game over! You've lost. Make sure to keep less than 8 cards in the pool next time. You have "+points+" points. Want to play again? Click here!";
+    }
+    //fade in the following
+    appendMessageToDiv(finalMessage,$('#'+arrayId));
+    document.getElementById("game-over").addEventListener("click",function(){
+      window.location.reload();
+    });
+  }
+
+  function appendMessageToDiv(finalMessage,parentDivId){   
+    var htmlToAppend =
+    '<div class="game-over" id="game-over-id">'+
+      '<p class="final-message">'+finalMessage+'</p>'+
+    '</div>';    
+    $('body').append(htmlToAppend);   
+  }
 }
