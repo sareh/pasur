@@ -274,8 +274,8 @@ window.onload = function(){
   function moveToStash(){
     document.getElementById(selectedFromHand.id).firstChild.src = "./images/backside.png";
     document.getElementById(selectedFromPool.id).firstChild.src = "./images/backside.png";
-    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromHand.id));
-    document.getElementById("player-stash").appendChild(document.getElementById(selectedFromPool.id));
+    document.getElementById("horizontal-player-stash").appendChild(document.getElementById(selectedFromHand.id));
+    document.getElementById("horizontal-player-stash").appendChild(document.getElementById(selectedFromPool.id));
     removeEventListenerOnHandCard(selectedFromHand.id);
     removeEventListenerOnPoolCard(selectedFromPool.id);
 
@@ -294,7 +294,7 @@ window.onload = function(){
 
   function moveFromHandToStash(cardId){
     document.getElementById(cardId).firstChild.src = "./images/backside.png";
-    document.getElementById("player-stash").appendChild(document.getElementById(cardId));
+    document.getElementById("horizontal-player-stash").appendChild(document.getElementById(cardId));
     removeEventListenerOnHandCard(cardId);
     document.getElementById(cardId).classList.remove("selected");
     document.getElementById(cardId).classList.add("stashed");
@@ -308,7 +308,7 @@ window.onload = function(){
 
   function moveFromPoolToStash(cardId){
     document.getElementById(cardId).firstChild.src = "./images/backside.png";
-    document.getElementById("player-stash").appendChild(document.getElementById(cardId));
+    document.getElementById("horizontal-player-stash").appendChild(document.getElementById(cardId));
     removeEventListenerOnPoolCard(cardId);
     document.getElementById(cardId).classList.remove("selected");
     document.getElementById(cardId).classList.add("stashed");
@@ -379,7 +379,7 @@ window.onload = function(){
     for(var i=0; i < cardsInStash.length; i++){
       sum += cards[cardsInStash[i].id].points;
     }
-    document.getElementById("player-score").innerHTML = sum;
+    document.getElementById("horizontal-player-score").innerHTML = sum;
     playerPoints = sum;
     return playerPoints;
   }
