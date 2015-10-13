@@ -3,7 +3,6 @@ window.onload = function(){
   var cards               = {};
   var unplayedCards       = [];
   var playedCards         = [];
-  var turn                = 0;
 
   var hasSelectedFromHand   = false;
   var hasSelectedFromPool   = false;
@@ -39,6 +38,8 @@ window.onload = function(){
   clearBoard();  
   initialDeal();
   
+  setEventListenerOnIntro();
+  setEventListenerOnGameOver();
   setEventListenerOnHandCards();
   setEventListenerOnPoolDiv();
   setEventListenerOnPoolCards();
@@ -50,9 +51,37 @@ window.onload = function(){
   /******************************************/   
   /*********Initialisation Functions********/
   /****************************************/
+
   function playGame(){
 
   }
+
+  function resetInitialVariables(){
+
+    unplayedCards       = [];
+    playedCards         = [];
+
+    hasSelectedFromHand   = false;
+    hasSelectedFromPool   = false;
+    selectedFromHand      = "";
+    selectedFromPool      = "";
+    selectedFromPoolArray = [];
+    toBeStashed           = [];
+
+    playerHand   = [];
+    pool         = [];
+    playerStash  = [];
+    playerPoints = 0;
+    timeTaken    = 0;
+    endOfGame    = false;
+  }
+
+  function resetHoldingVariables(){
+    hasSelectedFromHand = false;
+    hasSelectedFromPool = false;
+    selectedFromHand  = "";
+    selectedFromPool  = "";
+  }  
 
   function createPasurCards(){
 
@@ -112,7 +141,7 @@ window.onload = function(){
     for(var i=0; i < 4; i++){
       var cardId = pickCardFromUnplayedMoveToPlayed();
       array.push(cardId);
-      moveCardInDom(cardId,null,$('#'+arrayId));
+      moveCardInDom(cardId,$('#'+arrayId));
     }
   }
 
@@ -124,7 +153,7 @@ window.onload = function(){
         displayEndOfGameSequence();
       }
       array.push(cardId);
-      moveCardInDom(cardId,null,$('#'+arrayId));
+      moveCardInDom(cardId,$('#'+arrayId));
     }
     setEventListenerOnHandCard(cardId);
   }
@@ -138,16 +167,44 @@ window.onload = function(){
     dealFour(playerHand, 'player-hand');
   }
 
-  function resetHoldingVariables(){
-    hasSelectedFromHand = false;
-    hasSelectedFromPool = false;
-    selectedFromHand  = "";
-    selectedFromPool  = "";
-  }
-
   /******************************************/   
   /*********Event Listener Functions********/
   /****************************************/
+
+  function setEventListenerOnIntro(){
+    removeOnClick(document.getElementsByTagName("body")[0],document.getElementById("game-intro"));
+  }
+
+  function setEventListenerOnGameOver(){
+    removeOnClick(document.getElementsByTagName("body")[0],document.getElementById("game-over"));
+  }
+
+  function removeOnClick(parentDomElement,domElement){
+    domElement.addEventListener("click",function(){
+      parentDomElement.removeChild(domElement);
+    });
+  }
+
+  //will be called as ...("click",displayEndOfGameSequence("win"));
+  //will be called as ...("click",displayEndOfGameSequence("lose"));
+  //is called when: have reached the end of the pack. ALSO when pool.length > 8
+  //append this message to the div.
+  function gameOver(winOrLose){ 
+    var finalMessage = "";
+    var points = document.getElementById("horizontal-player-score").innerHTML;
+    if(winOrLose === "win"){
+      finalMessage = "You've Won! You have "+points+" points. Want to play again? Click here!";
+    }else if(winOrLose === "lose"){
+      finalMessage = "Game over! You've lost. Make sure to keep less than 8 cards in the pool next time. You have "+points+" points. Want to play again? Click here!";
+    }
+    //fade in the following
+    appendMessageToDiv(finalMessage,$('#'+arrayId));
+    //
+    document.getElementById("game-over").addEventListener("click",function(){
+      console.log("Reset all elements!");
+        // window.location.reload();
+    });
+  }
 
   function setEventListenerOnPoolDiv(){
     document.getElementById("pool").addEventListener("click",function(){
@@ -214,31 +271,31 @@ window.onload = function(){
   }
 
   function poolCardListener(cardId){
-      if(!hasSelectedFromHand){
-        return "Select a card from the hand first!";
-      }
-      //this executes when (hasSelectedFromHand && hasSelectedFromPool)
-      //and also when (hasSelectedFromHand && !hasSelectedFromPool)
-      if(selectedFromPool.id === this.id){
-        selectedFromPool.classList.remove("selected");
-        selectedFromPool = "";
-        hasSelectedFromPool = false; //this one
-        return "Unselected the card you just clicked on.";
-      }
-      event.stopPropagation();
-      selectedFromPool = this;
-      hasSelectedFromPool  = true;
-      selectedFromPool.classList.add("selected");
+    if(!hasSelectedFromHand){
+      return "Select a card from the hand first!";
+    }
 
-      var a = cards[selectedFromPool.id].face;
-      var b = matches[cards[selectedFromHand.id].face];
+    if(selectedFromPool.id === this.id){
+      selectedFromPool.classList.remove("selected");
+      selectedFromPool = "";
+      hasSelectedFromPool = false; //this one
+      return "Unselected the card you just clicked on.";
+    }
 
-      if(parseInt(a) === parseInt(b)){
-        // console.log("The cards match!");
-        setTimeout(moveTwo,300);
-      } else {
-        console.log("Oops, they don't match. You lose the card. Try again!");
-      }
+    event.stopPropagation();
+    selectedFromPool = this;
+    hasSelectedFromPool  = true;
+    selectedFromPool.classList.add("selected");
+
+    var a = cards[selectedFromPool.id].face;
+    var b = matches[cards[selectedFromHand.id].face];
+
+    if(parseInt(a) === parseInt(b)){
+      // console.log("The cards match!");
+      setTimeout(moveTwo,300);
+    } else {
+      console.log("Oops, they don't match. You lose the card. Try again!");
+    }
   }
 
   /******************************************/   
@@ -272,8 +329,8 @@ window.onload = function(){
   }
 
   function moveToStash(){
-    document.getElementById(selectedFromHand.id).firstChild.src = "./images/backside.png";
-    document.getElementById(selectedFromPool.id).firstChild.src = "./images/backside.png";
+    document.getElementById(selectedFromHand.id).firstChild.src = "./images/tazhib.png";
+    document.getElementById(selectedFromPool.id).firstChild.src = "./images/tazhib.png";
     document.getElementById("horizontal-player-stash").appendChild(document.getElementById(selectedFromHand.id));
     document.getElementById("horizontal-player-stash").appendChild(document.getElementById(selectedFromPool.id));
     removeEventListenerOnHandCard(selectedFromHand.id);
@@ -293,7 +350,7 @@ window.onload = function(){
   }
 
   function moveFromHandToStash(cardId){
-    document.getElementById(cardId).firstChild.src = "./images/backside.png";
+    document.getElementById(cardId).firstChild.src = "./images/tazhib.png";
     document.getElementById("horizontal-player-stash").appendChild(document.getElementById(cardId));
     removeEventListenerOnHandCard(cardId);
     document.getElementById(cardId).classList.remove("selected");
@@ -307,7 +364,7 @@ window.onload = function(){
   }
 
   function moveFromPoolToStash(cardId){
-    document.getElementById(cardId).firstChild.src = "./images/backside.png";
+    document.getElementById(cardId).firstChild.src = "./images/tazhib.png";
     document.getElementById("horizontal-player-stash").appendChild(document.getElementById(cardId));
     removeEventListenerOnPoolCard(cardId);
     document.getElementById(cardId).classList.remove("selected");
@@ -354,7 +411,7 @@ window.onload = function(){
     $('#'+cardId).remove();
   }
 
-  function moveCardInDom(cardId, parentDivId, newParentDivId){
+  function moveCardInDom(cardId, newParentDivId){
     removeCard(cardId);
     appendCardToDiv(cardId, newParentDivId);
   }
@@ -384,28 +441,16 @@ window.onload = function(){
     return playerPoints;
   }
 
-//will be called as ...("click",displayEndOfGameSequence("win"));
-//will be called as ...("click",displayEndOfGameSequence("lose"));
-  function displayEndOfGameSequence(winOrLose){
-    var finalMessage = "";
-    //fade out the cards in the stash. 
-    // .classList.add("selected")
-    // document.getElementsByClassName("stashed")
-
-    if(winOrLose === "win"){
-      finalMessage = "You've Won! You have "+points+" points. Want to play again? Click here!";
-    }else if(winOrLose === "lose"){
-      finalMessage = "Game over! You've lost. Make sure to keep less than 8 cards in the pool next time. You have "+points+" points. Want to play again? Click here!";
-    }
-    //fade in the following
-    appendMessageToDiv(finalMessage,$('#'+arrayId));
-    document.getElementById("game-over").addEventListener("click",function(){
-      window.location.reload();
-    });
+  function prependGameOver(message){
+    var htmlToPrepend = '<div id="game-over">'+
+    '<p class="intro-para">'+message+'</p>'+
+    '</div>';
+    $('body').append(htmlToAppend);
   }
 
   function appendMessageToDiv(finalMessage,parentDivId){   
     var htmlToAppend =
+    
     '<div class="game-over" id="game-over-id">'+
       '<p class="final-message">'+finalMessage+'</p>'+
     '</div>';    
