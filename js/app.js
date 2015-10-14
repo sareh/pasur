@@ -1,5 +1,6 @@
 window.onload = function(){
 
+
   var cards               = {};
   var unplayedCards       = [];
   var playedCards         = [];
@@ -30,89 +31,88 @@ window.onload = function(){
                  "11":"11",
                  "12":"12",
                  "13":"13"
-                 };
+                };
 
-  /******************************************/                
-  
-  createPasurCards();
-  clearBoard();  
-  initialDeal();
-  
-  setEventListenerOnIntro();
-  setEventListenerOnGameOver();
-  setEventListenerOnHandCards();
-  setEventListenerOnPoolDiv();
-  setEventListenerOnPoolCards();
-  
-  /******************************************/   
-  /**************Functions******************/
-  /****************************************/
+/******************************************/                
 
-  /******************************************/   
-  /*********Initialisation Functions********/
-  /****************************************/
+createPasurCards();
+clearBoard();  
+initialDeal();
 
-  function playGame(){
+setEventListenerOnIntro();
+setEventListenerOnHandCards();
+setEventListenerOnPoolDiv();
+setEventListenerOnPoolCards();
 
-  }
+/******************************************/   
+/**************Functions******************/
+/****************************************/
 
-  function resetInitialVariables(){
+/******************************************/   
+/*********Initialisation Functions********/
+/****************************************/
 
-    unplayedCards       = [];
-    playedCards         = [];
+function playGame(){
 
-    hasSelectedFromHand   = false;
-    hasSelectedFromPool   = false;
-    selectedFromHand      = "";
-    selectedFromPool      = "";
-    selectedFromPoolArray = [];
-    toBeStashed           = [];
+}
 
-    playerHand   = [];
-    pool         = [];
-    playerStash  = [];
-    playerPoints = 0;
-    timeTaken    = 0;
-    endOfGame    = false;
-  }
+function resetInitialVariables(){
 
-  function resetHoldingVariables(){
-    hasSelectedFromHand = false;
-    hasSelectedFromPool = false;
-    selectedFromHand  = "";
-    selectedFromPool  = "";
-  }  
+  unplayedCards       = [];
+  playedCards         = [];
 
-  function createPasurCards(){
+  hasSelectedFromHand   = false;
+  hasSelectedFromPool   = false;
+  selectedFromHand      = "";
+  selectedFromPool      = "";
+  selectedFromPoolArray = [];
+  toBeStashed           = [];
+
+  playerHand   = [];
+  pool         = [];
+  playerStash  = [];
+  playerPoints = 0;
+  timeTaken    = 0;
+  endOfGame    = false;
+}
+
+function resetHoldingVariables(){
+  hasSelectedFromHand = false;
+  hasSelectedFromPool = false;
+  selectedFromHand  = "";
+  selectedFromPool  = "";
+}  
+
+function createPasurCards(){
 
     //initialising clubs:
     for(var i=1; i < 14; i++){
       cards["c"+i] = {suit   : "c",
-                      face   : i,
-                      points : 1,
-                      img    : "1_"+i+".png"};
+      face   : i,
+      points : 1,
+      img    : "1_"+i+".png"};
     }
     cards.c2.points = 2; //2 of clubs has 2 points     
     //initialising spades:
     for(var i=1; i < 14; i++){
       cards["s"+i] = {suit   : "s",
-                      face   : i,
-                      points : 0,
-                      img    : "2_"+i+".png"};
+      face   : i,
+      points : 0,
+      img    : "2_"+i+".png"};
     }         
     //initialising hearts:
     for(var i=1; i < 14; i++){
       cards["h"+i] = {suit   : "h",
-                      face   : i,
-                      points : 0,
-                      img    : "3_"+i+".png"};
+      face   : i,
+      points : 0,
+      img    : "3_"+i+".png"};
     }    
     //initialising diamonds:
     for(var i=1; i < 14; i++){
       cards["d"+i] = {suit   : "d",
-                      face   : i,
-                      points : 0,
-                      img    : "4_"+i+".png"};
+      face   : i,
+      points : 0,
+      img    : "4_"+i+".png"};
     }       
     cards.d10.points = 3; //3 of diamonds has 3 points
     //All jacks & aces have 1 point, regardless of suit. 
@@ -150,7 +150,7 @@ window.onload = function(){
       var cardId = pickCardFromUnplayedMoveToPlayed();
       if(!cardId){
         endOfGame = true;
-        displayEndOfGameSequence();
+        gameOver("win");
       }
       array.push(cardId);
       moveCardInDom(cardId,$('#'+arrayId));
@@ -176,7 +176,8 @@ window.onload = function(){
   }
 
   function setEventListenerOnGameOver(){
-    removeOnClick(document.getElementsByTagName("body")[0],document.getElementById("game-over"));
+    // removeOnClick(document.getElementsByTagName("body")[0],document.getElementById("game-over"));
+    refreshOnClick(document.getElementById("game-over"));
   }
 
   function removeOnClick(parentDomElement,domElement){
@@ -185,10 +186,12 @@ window.onload = function(){
     });
   }
 
-  //will be called as ...("click",displayEndOfGameSequence("win"));
-  //will be called as ...("click",displayEndOfGameSequence("lose"));
-  //is called when: have reached the end of the pack. ALSO when pool.length > 8
-  //append this message to the div.
+  function refreshOnClick(domElement){
+    domElement.addEventListener("click",function(){
+      document.location.reload(true);
+    })
+  }
+
   function gameOver(winOrLose){ 
     var finalMessage = "";
     var points = document.getElementById("horizontal-player-score").innerHTML;
@@ -197,13 +200,8 @@ window.onload = function(){
     }else if(winOrLose === "lose"){
       finalMessage = "Game over! You've lost. Make sure to keep less than 8 cards in the pool next time. You have "+points+" points. Want to play again? Click here!";
     }
-    //fade in the following
-    appendMessageToDiv(finalMessage,$('#'+arrayId));
-    //
-    document.getElementById("game-over").addEventListener("click",function(){
-      console.log("Reset all elements!");
-        // window.location.reload();
-    });
+    prependMessageToDiv(finalMessage,$('.game-container'));
+    setEventListenerOnGameOver();
   }
 
   function setEventListenerOnPoolDiv(){
@@ -232,6 +230,12 @@ window.onload = function(){
   }
 
   function handCardListener(){
+    if(pool.length === 8){    
+      var ispossible = checkIfPossibleToContinue();
+      if(!ispossible){
+        gameOver("lose");
+      }
+    }
     if(hasSelectedFromHand && (selectedFromHand.id !== this.id)){
       return "You have already clicked on another card. This not allowed.";
     }
@@ -256,6 +260,20 @@ window.onload = function(){
     }
   }
 
+  function checkIfPossibleToContinue(){
+    var a, b;
+    for(var i=0; i < 4; i++){
+      a = cards[playerHand[i]].face;
+      for(var j=0; j < 8; j++){
+        b = matches[cards[pool[j]].face];
+        if(parseInt(a) === parseInt(b)){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   function setEventListenerOnPoolCards(){
     for(var i=0; i < pool.length; i++){
       setEventListenerOnPoolCard(pool[i]);
@@ -278,7 +296,7 @@ window.onload = function(){
     if(selectedFromPool.id === this.id){
       selectedFromPool.classList.remove("selected");
       selectedFromPool = "";
-      hasSelectedFromPool = false; //this one
+      hasSelectedFromPool = false;
       return "Unselected the card you just clicked on.";
     }
 
@@ -294,7 +312,7 @@ window.onload = function(){
       // console.log("The cards match!");
       setTimeout(moveTwo,300);
     } else {
-      console.log("Oops, they don't match. You lose the card. Try again!");
+      // console.log("Oops, they don't match. You lose the card. Try again!");
     }
   }
 
@@ -402,7 +420,7 @@ window.onload = function(){
   function appendCardToDiv(card,parentDivId){   
     var htmlToAppend =
     '<div class="card" id="'+card+'">'+
-      '<img src="./images/'+cards[card].img+'">'+
+    '<img src="./images/'+cards[card].img+'">'+
     '</div>'; 
     $(parentDivId).append(htmlToAppend);   
   }
@@ -448,12 +466,13 @@ window.onload = function(){
     $('body').append(htmlToAppend);
   }
 
-  function appendMessageToDiv(finalMessage,parentDivId){   
-    var htmlToAppend =
+  function prependMessageToDiv(finalMessage,parentDivId){   
+    var htmlToPrepend =
     
-    '<div class="game-over" id="game-over-id">'+
-      '<p class="final-message">'+finalMessage+'</p>'+
+    '<div id="game-over">'+
+    '<p class="game-over-para">'+finalMessage+'</p>'+
     '</div>';    
-    $('body').append(htmlToAppend);   
+    parentDivId.prepend(htmlToPrepend);   
   }
+
 }
