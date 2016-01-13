@@ -1,5 +1,7 @@
 # Sareh's Pasur
 
+[Here is a link to this game, deployed on Heroku.](https://pasur.herokuapp.com/)
+
 ## Background
 
  - This is my first project during [General Assembly's Web Development Immersive](https://generalassemb.ly/education/web-development-immersive) - a 12 week full stack web dev course.
